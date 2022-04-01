@@ -28,7 +28,7 @@ void initializeMemory() {
 void buildMatrix(int rows, int cols) {
     initializeMemory();
     card matrix[rows][cols];
-    for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < rows; i++) { //construir algoritmo de contrucción aqui
         for (int j = 0; j < cols; j++) {
             matrix[i][j].posX = i;
             matrix[i][j].posY = j;
