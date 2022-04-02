@@ -7,13 +7,16 @@
 #include <iostream>
 #define PORT 8080
 
-int main(int argc, char const *argv[]) {
-    int server_fd, new_socket, valread;
-    struct sockaddr_in address = {};
-    int opt = 1;
-    int addrlen = sizeof(address);
-    char buffer[1024] = {0};
-    const char *hello = "Hello from server";
+using namespace std;
+
+int server_fd, new_socket, valread;
+struct sockaddr_in address = {};
+int opt = 1;
+int addrlen = sizeof(address);
+char buffer[1024] = {0};
+const char *hello = "Hello from server";
+
+void initializeServer() {
 
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -47,9 +50,30 @@ int main(int argc, char const *argv[]) {
     printf("%s\n", buffer);
     send(new_socket, hello, strlen(hello), 0);
     printf("Hello message sent\n");
+}
 
-	valread = read(new_socket, buffer, 1024);
-    printf("%s\n", buffer);
+void readSocket() {
+    memset(buffer, 0, valread);
+    cout << "Client: ";
+    read(new_socket, buffer, 1024);
+    cout << buffer << endl;
+}
+
+void sendToClient(const char* msg) {
+    send(new_socket, msg, strlen(msg), 0);
+     cout << "Message sent: " << msg;
+}
+
+
+int main(int argc, char const *argv[]) {
+    initializeServer();
+
+    //solicitar nombres
+
+    readSocket();
+    sendToClient("Imagen de la carta");
+    readSocket();
+    sendToClient("Imagen de la carta");
     
     return 0;
 }
