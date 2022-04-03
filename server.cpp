@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <iostream>
+#include "paged_Matrix.cpp"
 #define PORT 8080
 
 using namespace std;
@@ -15,9 +16,9 @@ int opt = 1;
 int addrlen = sizeof(address);
 char buffer[1024] = {0};
 const char *hello = "Hello from server";
+paged_Matrix m;
 
 void initializeServer() {
-
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
@@ -52,28 +53,44 @@ void initializeServer() {
     printf("Hello message sent\n");
 }
 
-void readSocket() {
+const char* readSocket() {
     memset(buffer, 0, valread);
     cout << "Client: ";
     read(new_socket, buffer, 1024);
     cout << buffer << endl;
+    const char *msg = buffer;
+    return msg;
 }
 
 void sendToClient(const char* msg) {
     send(new_socket, msg, strlen(msg), 0);
-     cout << "Message sent: " << msg;
+    cout << "Message sent: " << msg << endl;
 }
 
+const char* readCard(const char *c) {
+    return m.getImage(m.seekInMatrix(c[0]-48, c[2]-48)); //-48 sirve para convertir de ASCII a int
+}
 
-int main(int argc, char const *argv[]) {
+void logicRevealCard() {
+    sendToClient(readCard(readSocket()));
+}
+
+void logicTurn() {
+    logicRevealCard();
+    logicRevealCard();
+}
+
+int main(int argc, char const *argv[])
+{
     initializeServer();
-
     //solicitar nombres
 
-    readSocket();
-    sendToClient("Imagen de la carta");
-    readSocket();
-    sendToClient("Imagen de la carta");
-    
+    logicTurn();
+
+
+    cout << m.isPairs() << endl;
+
+
+
     return 0;
 }
