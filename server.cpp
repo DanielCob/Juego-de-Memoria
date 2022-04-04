@@ -11,15 +11,17 @@
 using namespace std;
 
 int server_fd, new_socket, valread;
-struct sockaddr_in address = {};
-int opt = 1;
-int addrlen = sizeof(address);
 char buffer[1024] = {0};
 const char *player1_name;
 const char *player2_name;
+int pointsP1;
+int pointsP2;
 paged_Matrix m;
 
 void initializeServer() {
+    struct sockaddr_in address = {};
+    int opt = 1;
+    int addrlen = sizeof(address);
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
@@ -83,7 +85,7 @@ void logicOrder() {
 }
 
 const char* readCard(const char *c) {
-    return m.getImage(m.seekInMatrix(c[0]-48, c[2]-48)); //-48 sirve para convertir de ASCII a int
+    return m.getImage(m.seekCard(c[0]-48, c[2]-48)); //-48 sirve para convertir de ASCII a int
 }
 
 void logicRevealCard() {
