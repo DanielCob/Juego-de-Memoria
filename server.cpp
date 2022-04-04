@@ -15,7 +15,8 @@ struct sockaddr_in address = {};
 int opt = 1;
 int addrlen = sizeof(address);
 char buffer[1024] = {0};
-const char *hello = "Hello from server";
+const char *player1_name;
+const char *player2_name;
 paged_Matrix m;
 
 void initializeServer() {
@@ -47,6 +48,7 @@ void initializeServer() {
         perror("accept");
         exit(EXIT_FAILURE);
     }
+    const char *hello = "Hello from server";
     valread = read(new_socket, buffer, 1024);
     printf("%s\n", buffer);
     send(new_socket, hello, strlen(hello), 0);
@@ -56,15 +58,28 @@ void initializeServer() {
 const char* readSocket() {
     memset(buffer, 0, valread);
     cout << "Client: ";
-    read(new_socket, buffer, 1024);
+    valread = read(new_socket, buffer, 1024);
     cout << buffer << endl;
-    const char *msg = buffer;
-    return msg;
+    return buffer;
 }
 
 void sendToClient(const char* msg) {
     send(new_socket, msg, strlen(msg), 0);
     cout << "Message sent: " << msg << endl;
+}
+
+void readNames() {
+    player1_name = readSocket();
+    player2_name = readSocket();
+}
+
+void logicOrder() {
+    int i = rand()%3;
+    if (i == 1) {
+        sendToClient("0");
+    } else {
+        sendToClient("1");
+    }
 }
 
 const char* readCard(const char *c) {
@@ -78,19 +93,19 @@ void logicRevealCard() {
 void logicTurn() {
     logicRevealCard();
     logicRevealCard();
+    sendToClient(m.isPairs());
 }
 
 int main(int argc, char const *argv[])
 {
     initializeServer();
-    //solicitar nombres
+    readNames();
+    logicOrder();
 
     logicTurn();
-
-
-    cout << m.isPairs() << endl;
-
-
+    logicTurn();
+    logicTurn();
+    logicTurn();
 
     return 0;
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include <fstream>
 
 using namespace std;
@@ -21,15 +22,16 @@ private:
     card memoryMatrix; //usar para la paginación
     card tempCard1; //propenso a cambiar
     card tempCard2; //propenso a cambiar
-    bool temp1 = true;
+    bool temp = true;
 
 public:
     paged_Matrix();
     void initializeMemory();
     void buildMatrix(int rows, int cols);
     card seekInMatrix(int i, int j);
+    vector <const char*> shuffleCards();
     const char* getImage(card c);
-    bool isPairs();
+    const char* isPairs();
 };
 
 paged_Matrix::paged_Matrix() {
@@ -49,29 +51,49 @@ void paged_Matrix::initializeMemory() {
 
 void paged_Matrix::buildMatrix(int rows, int cols) {
     initializeMemory();
+    vector <const char*> cards = shuffleCards();
     card matrix[rows][cols];
+    int k = 0;
     for (int i = 0; i < rows; i++) { //construir algoritmo de contrucción de matriz aqui
         for (int j = 0; j < cols; j++) {
             matrix[i][j].posX = i;
             matrix[i][j].posY = j;
-            matrix[i][j].image = "imagen fachera";
+            matrix[i][j].image = cards[k];
+            k++;
         }
     }
 
     vmem.write((char*) &matrix, sizeof(card[rows][cols])); //Escribe en vmem la matriz recién hecha
 }
 
+vector <const char*> paged_Matrix::shuffleCards() {
+    vector <const char*> deck = {"gato1", "gato2", "gato3", "gato4", "gato5", "gato6", "gato7", "gato8"
+    , "gato9", "gato10", "gato11", "gato12", "gato13", "gato14", "gato15", "gato1", "gato2", "gato3"
+    , "gato4", "gato5", "gato6", "gato7", "gato8", "gato9", "gato10", "gato11", "gato12", "gato13"
+    , "gato14", "gato15"};
+
+    vector <const char*> shuffledDeck;
+
+    while (!deck.empty())
+    {
+        size_t rand_index = rand()%deck.size();
+        shuffledDeck.push_back(deck[rand_index]);
+        deck.erase(deck.begin() + rand_index);
+    }
+    
+    return shuffledDeck;
+}
+
 card paged_Matrix::seekInMatrix(int i, int j) {
     card c;
     vmem.seekg(16*cols*i+16*j, ios::beg); //16 es el tamaño en bytes del struct carta.
     vmem.read((char*) &c, sizeof(card)); //escribimos en la nueva matriz los datos de la memoria virtual.
-    
-    if (temp1) { //muy propenso a cambiar
+    if (temp) { //muy propenso a cambiar
         tempCard1 = c;
-        temp1 = false;
+        temp = false;
     } else {
         tempCard2 = c;
-        temp1 = true;
+        temp = true;
     }
     return c;
 }
@@ -80,23 +102,9 @@ const char* paged_Matrix::getImage(card c) {
     return c.image;
 }
 
-bool paged_Matrix::isPairs() {
+const char* paged_Matrix::isPairs() {
     if (tempCard1.image == tempCard2.image) {
-        return true;
+        return "1";
     }
-    return false;
+    return "0";
 }
-
-// int main(int argc, char const *argv[]) {
-//     paged_Matrix p;
-    
-//     int i = 2, j=2;
-
-//     cout << p.seekInMatrix(2, 2).posX << endl;
-//     cout << p.seekInMatrix(2, 2).posY << endl;
-//     cout << p.seekInMatrix(2, 2).image << endl;
-//     cout << "Tamaño en bytes de carta: " << sizeof(card) << " bytes" << endl;
-//     cout << sizeof(card[3][3]) << endl;
-    
-//     return 0;
-// }
