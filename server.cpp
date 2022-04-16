@@ -11,11 +11,11 @@
 using namespace std;
 
 int server_fd, new_socket, valread;
-char buffer[1024] = {0};
+char buffer[1042] = {0};
 const char *player1_name;
 const char *player2_name;
-int pointsP1;
-int pointsP2;
+int pointsP1 = 0;
+int pointsP2 = 0;
 paged_Matrix m;
 
 void initializeServer() {
@@ -72,30 +72,32 @@ void sendToClient(const char* msg) {
 
 void readNames() {
     player1_name = readSocket();
+    sendToClient(to_string(pointsP1).c_str());
     player2_name = readSocket();
+    sendToClient(to_string(pointsP2).c_str());
 }
 
 void logicOrder() {
-    int i = rand()%3;
-    if (i == 1) {
-        sendToClient("0");
-    } else {
-        sendToClient("1");
-    }
+    readSocket();
+    srand(time(0));
+    int i = rand()%2;
+    sendToClient(to_string(i).c_str());
 }
 
-const char* readCard(const char *c) {
+string readCard(const char *c) {
     return m.getImage(m.seekCard(c[0]-48, c[2]-48)); //-48 sirve para convertir de ASCII a int
 }
 
 void logicRevealCard() {
-    sendToClient(readCard(readSocket()));
+    sendToClient(readCard(readSocket()).c_str());
 }
 
 void logicTurn() {
     logicRevealCard();
     logicRevealCard();
-    sendToClient(m.isPairs());
+    //readSocket();
+    //sendToClient(m.isPairs());   
+
 }
 
 int main(int argc, char const *argv[])
@@ -103,11 +105,10 @@ int main(int argc, char const *argv[])
     initializeServer();
     readNames();
     logicOrder();
-
-    logicTurn();
-    logicTurn();
-    logicTurn();
-    logicTurn();
+    while (true)
+    {
+        logicTurn();
+    }
 
     return 0;
 }

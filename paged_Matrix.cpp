@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+#include <string.h>
 #include <vector>
 #include <fstream>
 
@@ -11,7 +11,7 @@ using std::ios;
 struct card {
     int posX;
     int posY;
-    const char* image;
+    char image[19000];
 };
 
 class paged_Matrix
@@ -30,20 +30,19 @@ private:
 public:
     paged_Matrix();
     void initializeMemory();
+    string readImage(const char* i);
     void buildMatrix(int rows, int cols);
     void shuffleMemoryMatrix();
     card seekCard(int i, int j);
     card seekinMatrix(int i, int j);
-    vector <const char*> shuffleCards();
-    const char* getImage(card c);
+    vector <string> shuffleCards();
+    string getImage(card c);
     const char* isPairs();
 };
 
 paged_Matrix::paged_Matrix() {
     buildMatrix(rows, cols);
     shuffleMemoryMatrix();
-    tempCard1 = -1; //BORRAR DEFINITIVAMENTE
-    tempCard2 = -1; //BORRAR DEFINITIVAMENTE
 }
 
 void paged_Matrix::initializeMemory() {
@@ -55,16 +54,32 @@ void paged_Matrix::initializeMemory() {
     }
 }
 
+string paged_Matrix::readImage(const char* i){
+    ifstream image;
+    string img_dir;
+    string img_string;
+    img_dir.append("img/");
+    img_dir.append(i);
+    img_dir.append(".txt");
+    image.open(img_dir);
+    getline(image, img_string);
+    image.close();
+
+    return img_string;
+}
+
 void paged_Matrix::buildMatrix(int rows, int cols) {
     initializeMemory();
-    vector <const char*> cards = shuffleCards();
+    vector <string> cards = shuffleCards();
     card matrix[rows][cols];
     int k = 0;
-    for (int i = 0; i < rows; i++) { //construir algoritmo de contrucción de matriz aqui
+    for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             matrix[i][j].posX = i;
             matrix[i][j].posY = j;
-            matrix[i][j].image = cards[k];
+            for (int z = 0; z < sizeof(char[19000]); z++) {
+                matrix[i][j].image[z] = cards[k][z];
+            }
             k++;
         }
     }
@@ -72,13 +87,17 @@ void paged_Matrix::buildMatrix(int rows, int cols) {
     vmem.write((char*) &matrix, sizeof(card[rows][cols])); //Escribe en vmem la matriz recién hecha
 }
 
-vector <const char*> paged_Matrix::shuffleCards() {
-    vector <const char*> deck = {"gato1", "gato2", "gato3", "gato4", "gato5", "gato6", "gato7", "gato8"
-    , "gato9", "gato10", "gato11", "gato12", "gato13", "gato14", "gato15", "gato1", "gato2", "gato3"
-    , "gato4", "gato5", "gato6", "gato7", "gato8", "gato9", "gato10", "gato11", "gato12", "gato13"
-    , "gato14", "gato15"};
+vector <string> paged_Matrix::shuffleCards() {
+    vector <string> deck;
+    for (int i = 1; i < 16; i++)
+    {
+        deck.push_back(readImage(to_string(i).c_str()));
+        deck.push_back(readImage(to_string(i).c_str()));
+    }
 
-    vector <const char*> shuffledDeck;
+    vector <string> shuffledDeck;
+
+    srand(time(0));
 
     while (!deck.empty())
     {
@@ -97,7 +116,7 @@ void paged_Matrix::shuffleMemoryMatrix() {
         size_t rand_i = rand()%rows;
         size_t rand_j = rand()%cols;
         memoryMatrix.push_back(seekinMatrix(rand_i, rand_j));
-        cout << memoryMatrix[i].posX << memoryMatrix[i].posY << memoryMatrix[i].image << endl;
+        cout << memoryMatrix[i].posX << memoryMatrix[i].posY << endl;
     }
 }
 
@@ -110,7 +129,7 @@ card paged_Matrix::seekCard(int i, int j) {
             {
                 pageHit++;
                 cout << "pageHits: "<< pageHit << endl;
-                return memoryMatrix[i];
+                return memoryMatrix[x];
             } 
         }
     }
@@ -121,7 +140,7 @@ card paged_Matrix::seekCard(int i, int j) {
 
 card paged_Matrix::seekinMatrix(int i, int j) {
     card c; //busca en la matriz en disco
-    vmem.seekg(16*cols*i+16*j, ios::beg); //16 es el tamaño en bytes del struct carta.
+    vmem.seekg(sizeof(card)*cols*i+sizeof(card)*j, ios::beg); //40 es el tamaño en bytes del struct carta.
     vmem.read((char*) &c, sizeof(card)); //escribimos en la nueva matriz los datos de la memoria virtual.
     if (temp) { //muy propenso a cambiar
         tempCard1 = i*10 + j;
@@ -133,7 +152,7 @@ card paged_Matrix::seekinMatrix(int i, int j) {
     return c;
 }
 
-const char* paged_Matrix::getImage(card c) {
+string paged_Matrix::getImage(card c) {
     return c.image;
 }
 
