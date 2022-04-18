@@ -14,6 +14,7 @@ int server_fd, new_socket, valread;
 char buffer[1042] = {0};
 const char *player1_name;
 const char *player2_name;
+int turn;
 int pointsP1 = 0;
 int pointsP2 = 0;
 paged_Matrix m;
@@ -67,7 +68,7 @@ const char* readSocket() {
 
 void sendToClient(const char* msg) {
     send(new_socket, msg, strlen(msg), 0);
-    cout << "Message sent: " << msg << endl;
+    //cout << "Message sent: " << msg << endl;
 }
 
 void readNames() {
@@ -77,10 +78,12 @@ void readNames() {
     sendToClient(to_string(pointsP2).c_str());
 }
 
-void logicOrder() {
+void logicOrder() { //define el orden de los turnos
     readSocket();
     srand(time(0));
-    int i = rand()%2;
+    int i = (rand()%2)+1;
+    turn = i;
+    cout << i << endl;
     sendToClient(to_string(i).c_str());
 }
 
@@ -92,12 +95,39 @@ void logicRevealCard() {
     sendToClient(readCard(readSocket()).c_str());
 }
 
+void logicAddPoints() {
+    if (turn == 1) {
+        pointsP1 += 100;
+    } else {
+        pointsP2 += 100;
+    }
+}
+
+void logicChangeTurn() {
+    if (turn == 1) {
+        turn = 2;
+    } else {
+        turn = 1;
+    }
+}
+
 void logicTurn() {
     logicRevealCard();
     logicRevealCard();
-    //readSocket();
-    //sendToClient(m.isPairs());   
-
+    readSocket();
+    if (m.isPairs()) {
+        logicAddPoints();
+        sendToClient("1");
+    } else {
+        sendToClient("0");
+    }
+    readSocket();
+    if (turn == 1) {
+        sendToClient(to_string(pointsP1).c_str());
+    } else {
+        sendToClient(to_string(pointsP2).c_str());
+    }
+    logicChangeTurn();
 }
 
 int main(int argc, char const *argv[])
@@ -105,7 +135,7 @@ int main(int argc, char const *argv[])
     initializeServer();
     readNames();
     logicOrder();
-    while (true)
+    while (m.get_cardsLeft() != 0)
     {
         logicTurn();
     }

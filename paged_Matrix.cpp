@@ -21,28 +21,34 @@ private:
     int rows = 5, cols = 6;
     int cardsLeft = rows*cols;
     vector <card> memoryMatrix; //usar para la paginación
-    int tempCard1; //propenso a cambiar
-    int tempCard2; //propenso a cambiar
+    string tempCard1; //propenso a cambiar
+    string tempCard2; //propenso a cambiar
     bool temp = true;
     int pageHit = 0;
     int pageFault = 0;
 
 public:
     paged_Matrix();
+    int get_cardsLeft();
     void initializeMemory();
     string readImage(const char* i);
     void buildMatrix(int rows, int cols);
     void shuffleMemoryMatrix();
     card seekCard(int i, int j);
-    card seekinMatrix(int i, int j);
+    card seekinMatrix(int i, int j, bool shuffle);
+    void saveTempCard(string cardImage);
     vector <string> shuffleCards();
     string getImage(card c);
-    const char* isPairs();
+    bool isPairs();
 };
 
 paged_Matrix::paged_Matrix() {
     buildMatrix(rows, cols);
     shuffleMemoryMatrix();
+}
+
+int paged_Matrix::get_cardsLeft() {
+    return cardsLeft;
 }
 
 void paged_Matrix::initializeMemory() {
@@ -101,7 +107,7 @@ vector <string> paged_Matrix::shuffleCards() {
 
     while (!deck.empty())
     {
-        size_t rand_index = rand()%deck.size();
+        size_t rand_index = rand()%(deck.size());
         shuffledDeck.push_back(deck[rand_index]);
         deck.erase(deck.begin() + rand_index);
     }
@@ -115,7 +121,7 @@ void paged_Matrix::shuffleMemoryMatrix() {
     {
         size_t rand_i = rand()%rows;
         size_t rand_j = rand()%cols;
-        memoryMatrix.push_back(seekinMatrix(rand_i, rand_j));
+        memoryMatrix.push_back(seekinMatrix(rand_i, rand_j, true));
         cout << memoryMatrix[i].posX << memoryMatrix[i].posY << endl;
     }
 }
@@ -129,38 +135,47 @@ card paged_Matrix::seekCard(int i, int j) {
             {
                 pageHit++;
                 cout << "pageHits: "<< pageHit << endl;
+                saveTempCard(memoryMatrix[x].image);
                 return memoryMatrix[x];
             } 
         }
     }
     pageFault++;
     cout << "pageFaults: " << pageFault << endl;
-    return seekinMatrix(i, j);
+    return seekinMatrix(i, j, false);
 }
 
-card paged_Matrix::seekinMatrix(int i, int j) {
+card paged_Matrix::seekinMatrix(int i, int j, bool shuffle) {
     card c; //busca en la matriz en disco
     vmem.seekg(sizeof(card)*cols*i+sizeof(card)*j, ios::beg); //40 es el tamaño en bytes del struct carta.
-    vmem.read((char*) &c, sizeof(card)); //escribimos en la nueva matriz los datos de la memoria virtual.
-    if (temp) { //muy propenso a cambiar
-        tempCard1 = i*10 + j;
-        temp = false;
-    } else {
-        tempCard2 = i*10 + j;
-        temp = true;
+    vmem.read((char*) &c, sizeof(card)); //leemos de la matriz los datos de la memoria virtual.
+    if (!shuffle) {    
+        size_t rand_index = rand()%(memoryMatrix.size()+1);
+        memoryMatrix[rand_index] = c; // se realiza el swap
+        saveTempCard(c.image);
     }
+
     return c;
 }
 
+void paged_Matrix::saveTempCard(string cardImage) {
+        if (temp) {
+        tempCard1 = cardImage;
+        temp = false;
+    } else {
+        tempCard2 = cardImage;
+        temp = true;
+    }
+}
 string paged_Matrix::getImage(card c) {
     return c.image;
 }
 
-const char* paged_Matrix::isPairs() {
+bool paged_Matrix::isPairs() {
     if (tempCard1 == tempCard2) {
         cardsLeft -= 2;
         shuffleMemoryMatrix();
-        return "1";
+        return true;
     }
-    return "0";
+    return false;
 }
