@@ -1,0 +1,53 @@
+<RCC>
+    <qresource prefix="/">
+        <file>../../Downloads/fondogato.jpg</file>
+        <file>../../Downloads/gatitospng/lo.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 15.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 14.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 13.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 12.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 11.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 10.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 9.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 8.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 7.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 6.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 5.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 4.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 3.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título 2.png</file>
+        <file>../../Downloads/gatitospng/Ilustración-sin-título.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/16.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/15.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/14.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/13.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/12.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/11.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/10.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/9.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/8.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/7.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/6.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/5.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/4.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/3.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/2.png</file>
+        <file>../../Downloads/iloveimg-resized(1)/1.png</file>
+        <file>../../Downloads/iloveimg-resized/16.png</file>
+        <file>../../Downloads/iloveimg-resized/15.png</file>
+        <file>../../Downloads/iloveimg-resized/14.png</file>
+        <file>../../Downloads/iloveimg-resized/13.png</file>
+        <file>../../Downloads/iloveimg-resized/12.png</file>
+        <file>../../Downloads/iloveimg-resized/11.png</file>
+        <file>../../Downloads/iloveimg-resized/10.png</file>
+        <file>../../Downloads/iloveimg-resized/9.png</file>
+        <file>../../Downloads/iloveimg-resized/8.png</file>
+        <file>../../Downloads/iloveimg-resized/7.png</file>
+        <file>../../Downloads/iloveimg-resized/6.png</file>
+        <file>../../Downloads/iloveimg-resized/5.png</file>
+        <file>../../Downloads/iloveimg-resized/4.png</file>
+        <file>../../Downloads/iloveimg-resized/3.png</file>
+        <file>../../Downloads/iloveimg-resized/2.png</file>
+        <file>../../Downloads/iloveimg-resized/1.png</file>
+    </qresource>
+</RCC>
