@@ -131,7 +131,6 @@ void logicOrder()
     srand(time(0));
     int i = (rand() % 2) + 1;
     turn = i;
-    cout << i << endl;
     sendToClient(to_string(i).c_str());
 }
 
@@ -226,6 +225,8 @@ void logicTurn()
         logicChangeTurn();
     }
     sendToClient("Ok");
+    cout << "P1 points: "<< pointsP1 << endl;
+    cout << "P2 points: "<< pointsP2 << endl;
 }
 
 int main(int argc, char const *argv[])

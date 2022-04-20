@@ -231,6 +231,12 @@ card paged_Matrix::seekinMatrix(int i, int j, bool shuffle) {
         size_t rand_index = rand()%(memoryMatrix.size()+1);
         memoryMatrix[rand_index] = c; // se realiza el swap
         saveTempCard(c.image);
+        cout << "Cards in memory:" << endl;
+        for (int i = 0; i < memoryMatrix.size(); i++) //imprime la matriz
+        {
+            cout << memoryMatrix[i].posX << memoryMatrix[i].posY << " ";
+        }
+        cout << endl;
     }
 
     return c;
