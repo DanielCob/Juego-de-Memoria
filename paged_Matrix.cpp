@@ -21,8 +21,9 @@ private:
     int rows = 5, cols = 6;
     int cardsLeft = rows*cols;
     vector <card> memoryMatrix; //usar para la paginación
-    string tempCard1; //propenso a cambiar
-    string tempCard2; //propenso a cambiar
+    string tempCard1; 
+    string tempCard2;
+    bool inMemory = false;
     bool temp = true;
     int pageHit = 0;
     int pageFault = 0;
@@ -30,6 +31,8 @@ private:
 public:
     paged_Matrix();
     int get_cardsLeft();
+    bool get_inMemory();
+    void set_inMemory(bool i);
     void initializeMemory();
     string readImage(const char* i);
     void buildMatrix(int rows, int cols);
@@ -49,6 +52,14 @@ paged_Matrix::paged_Matrix() {
 
 int paged_Matrix::get_cardsLeft() {
     return cardsLeft;
+}
+
+bool paged_Matrix::get_inMemory() {
+    return inMemory;
+}
+
+void paged_Matrix::set_inMemory(bool i) {
+    inMemory = i;
 }
 
 void paged_Matrix::initializeMemory() {
@@ -136,6 +147,7 @@ card paged_Matrix::seekCard(int i, int j) {
                 pageHit++;
                 cout << "pageHits: "<< pageHit << endl;
                 saveTempCard(memoryMatrix[x].image);
+                inMemory = true;
                 return memoryMatrix[x];
             } 
         }
@@ -147,7 +159,7 @@ card paged_Matrix::seekCard(int i, int j) {
 
 card paged_Matrix::seekinMatrix(int i, int j, bool shuffle) {
     card c; //busca en la matriz en disco
-    vmem.seekg(sizeof(card)*cols*i+sizeof(card)*j, ios::beg); //40 es el tamaño en bytes del struct carta.
+    vmem.seekg(sizeof(card)*cols*i+sizeof(card)*j, ios::beg); //18009 es el tamaño en bytes del struct carta.
     vmem.read((char*) &c, sizeof(card)); //leemos de la matriz los datos de la memoria virtual.
     if (!shuffle) {    
         size_t rand_index = rand()%(memoryMatrix.size()+1);
@@ -167,6 +179,7 @@ void paged_Matrix::saveTempCard(string cardImage) {
         temp = true;
     }
 }
+
 string paged_Matrix::getImage(card c) {
     return c.image;
 }

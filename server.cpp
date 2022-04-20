@@ -17,6 +17,7 @@ const char *player2_name;
 int turn;
 int pointsP1 = 0;
 int pointsP2 = 0;
+int multiplier = 1;
 paged_Matrix m;
 
 void initializeServer() {
@@ -60,9 +61,9 @@ void initializeServer() {
 
 const char* readSocket() {
     memset(buffer, 0, valread);
-    cout << "Client: ";
+    //cout << "Client: ";
     valread = read(new_socket, buffer, 1024);
-    cout << buffer << endl;
+    //cout << buffer << endl;
     return buffer;
 }
 
@@ -97,9 +98,15 @@ void logicRevealCard() {
 
 void logicAddPoints() {
     if (turn == 1) {
-        pointsP1 += 100;
+        if (m.get_inMemory()) {
+            pointsP1 += 100;
+        }
+        pointsP1 += 100*multiplier;
     } else {
-        pointsP2 += 100;
+        if (m.get_inMemory()) {
+            pointsP2 += 100;
+        }
+        pointsP2 += 100*multiplier;
     }
 }
 
@@ -114,20 +121,26 @@ void logicChangeTurn() {
 void logicTurn() {
     logicRevealCard();
     logicRevealCard();
-    readSocket();
+    multiplier = readSocket()[0]-48; //-48 sirve para convertir de ASCII a int
+    sendToClient("Ok");
+    readSocket(); //Is Pair?
     if (m.isPairs()) {
         logicAddPoints();
         sendToClient("1");
     } else {
         sendToClient("0");
     }
-    readSocket();
+    readSocket(); //points?
     if (turn == 1) {
         sendToClient(to_string(pointsP1).c_str());
     } else {
         sendToClient(to_string(pointsP2).c_str());
     }
-    logicChangeTurn();
+    m.set_inMemory(false);
+    if ((string) readSocket() == "false") { //double turn?
+        logicChangeTurn();
+    }
+    sendToClient("Ok");
 }
 
 int main(int argc, char const *argv[])
