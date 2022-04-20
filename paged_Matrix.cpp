@@ -1,3 +1,13 @@
+/**
+ * @file paged_Matrix.cpp
+ * @author Daniel Cob Beirute
+ * @brief la clase se encarga de administrar la matriz paginada, esto implica almacenar, buscar y paginar cartas
+ * @version 0.1
+ * @date 2022-04-19
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include <iostream>
 #include <string.h>
 #include <vector>
@@ -7,7 +17,10 @@ using namespace std;
 using std::fstream;
 using std::ofstream;
 using std::ios;
-
+/**
+ * @brief almacena la posición en X y Y, así como la imagen en base64
+ * 
+ */
 struct card {
     int posX;
     int posY;
@@ -17,12 +30,32 @@ struct card {
 class paged_Matrix
 {
 private:
+    /**
+     * @brief objeto utilizado para escribir y leer de vmemory.bin
+     * 
+     */
     fstream vmem;
     int rows = 5, cols = 6;
     int cardsLeft = rows*cols;
-    vector <card> memoryMatrix; //usar para la paginación
+    /**
+     * @brief almacena 1/3 de las cartas restantes en memoria
+     * 
+     */
+    vector <card> memoryMatrix;
+    /**
+     * @brief imagen de la última carta seleccionada
+     * 
+     */
     string tempCard1; 
+        /**
+     * @brief imagen de la última carta seleccionada
+     * 
+     */
     string tempCard2;
+    /**
+     * @brief indica si alguna de las últimas dos tarjetas estaba en memoria
+     * 
+     */
     bool inMemory = false;
     bool temp = true;
     int pageHit = 0;
@@ -61,7 +94,10 @@ bool paged_Matrix::get_inMemory() {
 void paged_Matrix::set_inMemory(bool i) {
     inMemory = i;
 }
-
+/**
+ * @brief crea el archivo vmemory.bin para almacenar la matriz en disco
+ * 
+ */
 void paged_Matrix::initializeMemory() {
     vmem = fstream("vmemory", ios::in | ios::out | ios::binary);
     if (!vmem.good()) {
@@ -70,7 +106,12 @@ void paged_Matrix::initializeMemory() {
         vmem = fstream("vmemory", ios::in | ios::out | ios::binary);
     }
 }
-
+/**
+ * @brief abre el archivo .txt que contiene la imagen en base64 y la retorna como un string.
+ * 
+ * @param i número de la imagen
+ * @return string imagen en base64
+ */
 string paged_Matrix::readImage(const char* i){
     ifstream image;
     string img_dir;
@@ -84,7 +125,12 @@ string paged_Matrix::readImage(const char* i){
 
     return img_string;
 }
-
+/**
+ * @brief construye la matriz con imagenes aleatorias, luego las escribe en el archivo vmemory.bin
+ * 
+ * @param rows 
+ * @param cols 
+ */
 void paged_Matrix::buildMatrix(int rows, int cols) {
     initializeMemory();
     vector <string> cards = shuffleCards();
@@ -103,7 +149,11 @@ void paged_Matrix::buildMatrix(int rows, int cols) {
 
     vmem.write((char*) &matrix, sizeof(card[rows][cols])); //Escribe en vmem la matriz recién hecha
 }
-
+/**
+ * @brief baraja las imagenes y las almacena como un vector de strings
+ * 
+ * @return vector <string> 
+ */
 vector <string> paged_Matrix::shuffleCards() {
     vector <string> deck;
     for (int i = 1; i < 16; i++)
@@ -125,7 +175,10 @@ vector <string> paged_Matrix::shuffleCards() {
     
     return shuffledDeck;
 }
-
+/**
+ * @brief elimina las cartas almacenadas en memoria y las intercambia por otras elegidas aleatoriamente
+ * 
+ */
 void paged_Matrix::shuffleMemoryMatrix() {
     memoryMatrix.clear();
     for (int i = 0; i < cardsLeft/3; i++)
@@ -136,7 +189,13 @@ void paged_Matrix::shuffleMemoryMatrix() {
         cout << memoryMatrix[i].posX << memoryMatrix[i].posY << endl;
     }
 }
-
+/**
+ * @brief busca la tarjeta solicitada. Primero realiza la busqueda en la memoria, si no la encuentra le pide a seekinMatrix que la lea en disco
+ * 
+ * @param i posición en X
+ * @param j posición en Y
+ * @return card 
+ */
 card paged_Matrix::seekCard(int i, int j) {
     for (size_t x = 0; x < memoryMatrix.size(); x++) //busca en la matriz en memoria la carta solicitada
     {
@@ -156,7 +215,14 @@ card paged_Matrix::seekCard(int i, int j) {
     cout << "pageFaults: " << pageFault << endl;
     return seekinMatrix(i, j, false);
 }
-
+/**
+ * @brief lee la tarjeta solicitada almacenada en disco (vmemory.bin)
+ * 
+ * @param i posición en X
+ * @param j posición en Y
+ * @param shuffle indica si el algoritmo se está solicitando para la fase de shuffle
+ * @return card 
+ */
 card paged_Matrix::seekinMatrix(int i, int j, bool shuffle) {
     card c; //busca en la matriz en disco
     vmem.seekg(sizeof(card)*cols*i+sizeof(card)*j, ios::beg); //18009 es el tamaño en bytes del struct carta.
@@ -169,7 +235,11 @@ card paged_Matrix::seekinMatrix(int i, int j, bool shuffle) {
 
     return c;
 }
-
+/**
+ * @brief almacena la última imagen solicitada
+ * 
+ * @param cardImage string de la imagen
+ */
 void paged_Matrix::saveTempCard(string cardImage) {
         if (temp) {
         tempCard1 = cardImage;
@@ -183,7 +253,12 @@ void paged_Matrix::saveTempCard(string cardImage) {
 string paged_Matrix::getImage(card c) {
     return c.image;
 }
-
+/**
+ * @brief verifica si las últimas dos tarjetas solicitadas tienen las misma imagen
+ * 
+ * @return true 
+ * @return false 
+ */
 bool paged_Matrix::isPairs() {
     if (tempCard1 == tempCard2) {
         cardsLeft -= 2;
