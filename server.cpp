@@ -10,6 +10,7 @@
  */
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/resource.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -225,18 +226,37 @@ void logicTurn()
         logicChangeTurn();
     }
     sendToClient("Ok");
-    cout << "P1 points: "<< pointsP1 << endl;
-    cout << "P2 points: "<< pointsP2 << endl;
+}
+
+long get_mem_usage() {
+    struct rusage myusage;
+
+    getrusage(RUSAGE_SELF, &myusage);
+    return myusage.ru_maxrss;
 }
 
 int main(int argc, char const *argv[])
 {
+    // long baseline = get_mem_usage();
+    // for (int i = 0; i < 100; i++)
+    // {
+    //     void *m = malloc(20*1024*1024);
+    //     memset(m,0,20*1024*1024);
+    //     printf("usage: %ld + %ld\n", baseline, get_mem_usage()-baseline);
+    // }
+    
+    cout << "memory usage: " << get_mem_usage() << " bytes" << endl;
     initializeServer();
+    cout << "memory usage: " << get_mem_usage() << " bytes" << endl;
     readNames();
     logicOrder();
     while (m.get_cardsLeft() != 0)
     {
         logicTurn();
+        cout << "P1 points: "<< pointsP1 << endl;
+        cout << "P2 points: "<< pointsP2 << endl;
+        cout << "memory usage: " << get_mem_usage() << " bytes" << endl;
+        cout << "-----------Next Turn-----------" << endl;
     }
 
     return 0;

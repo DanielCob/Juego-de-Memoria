@@ -186,8 +186,13 @@ void paged_Matrix::shuffleMemoryMatrix() {
         size_t rand_i = rand()%rows;
         size_t rand_j = rand()%cols;
         memoryMatrix.push_back(seekinMatrix(rand_i, rand_j, true));
-        cout << memoryMatrix[i].posX << memoryMatrix[i].posY << endl;
     }
+    cout << "Cards in memory:" << endl;
+    for (int i = 0; i < memoryMatrix.size(); i++) //imprime la matriz
+        {
+            cout << memoryMatrix[i].posX << memoryMatrix[i].posY << " ";
+        }
+    cout << endl;
 }
 /**
  * @brief busca la tarjeta solicitada. Primero realiza la busqueda en la memoria, si no la encuentra le pide a seekinMatrix que la lea en disco
